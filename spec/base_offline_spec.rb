@@ -7,28 +7,12 @@ describe "Generating a basic manifest" do
     cache "images/masthead.png"
   end
 
-  before do
+  it_should_behave_like "a cache manifest"
+
+  it "returns a different cache-busting comment each time" do
+    cache_buster = body[/^# .{64}$/]
     get "/"
-  end
-
-  it "returns the response as text/cache-manifest" do
-    headers["Content-Type"].should == "text/cache-manifest"
-  end
-
-  it "returns a 200 status code" do
-    status.should == 200
-  end
-
-  it "includes the text CACHE MANIFEST" do
-    body.should =~ /\ACACHE MANIFEST\n/
-  end
-
-  it "includes the entry to be cached on its own line" do
-    body.should =~ %r{^images/masthead.png$}
-  end
-
-  it "includes a cache-busting comment" do
-    body.should =~ %r{^# .{64}$}
+    body[/^# .{64}$/].should_not == cache_buster
   end
 
   it "doesn't contain a network section" do

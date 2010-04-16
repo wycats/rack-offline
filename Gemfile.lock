@@ -1,0 +1,28 @@
+--- 
+dependencies: 
+  rspec: 
+    group: 
+    - :test
+    version: ~> 2.0.0.beta.4
+  rack-test: 
+    group: 
+    - :test
+    version: ">= 0"
+    require: 
+    - rack/test
+specs: 
+- rack: 
+    version: 1.1.0
+- rack-test: 
+    version: 0.5.3
+- rspec-core: 
+    version: 2.0.0.beta.4
+- rspec-expectations: 
+    version: 2.0.0.beta.4
+- rspec-mocks: 
+    version: 2.0.0.beta.4
+- rspec: 
+    version: 2.0.0.beta.4
+hash: cffb78a951f7b10fea8527f366f4830e6045ae1e
+sources: []
+

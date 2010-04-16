@@ -1,4 +1,4 @@
 .bundle
 public
 config.ru
-Gemfile*
+spec/fixture_root
