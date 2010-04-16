@@ -1,0 +1,4 @@
+.bundle
+public
+config.ru
+Gemfile*

@@ -1,0 +1,211 @@
+h1. HTML5 Offline
+
+HTML5 provides two robust offline capabilities already implemented in popular mobile devices, such as the iPhone and Android, and on modern desktop browsers based on the Webkit and Gecko rendering engines.
+
+h2. Usage
+
+The easiest way to use Rack::Offline is by using Rails::Offline in a Rails application.
+In your router:
+
+<pre lang="ruby">
+match "/application.manifest" => Rails::Offline
+</pre>
+
+This will automatically cache all JavaScript, CSS, and HTML in your @public@
+directory, and will cause the cache to be updated each request in development
+mode.
+
+You can fine-tune the behavior of Rack::Offline by using it directly:
+
+<pre lang="ruby">
+offline = Rack::Offline.configure do
+  cache "images/masthead.png"
+
+  public_path = Rails.public_path
+  Dir[public_path.join("javascripts/*.js")].each do |file|
+    cache file.relative_path_from(public_path)
+  end
+
+  network "/"
+end
+</pre>
+
+You can pass an options Hash into #configure in Rack::Offline:
+
+|_. name |_. purpose |_. value in Rails::Offline |
+| :cache | false means that the browser should download the assets on each request if a connection to the server can be made | the same as config.cache_classes |
+| :logger | a logger to send messages to | Rails.logger |
+| :root | The location of files listed in the manifest | Rails.public_path |
+
+h2. Application Cache
+
+The App Cache allows you to specify that the browser should cache certain files, and ensure that the user can access them even if the device is offline.
+
+You specify an application's cache with a new @manifest@ attribute on the @html@ element, which must point at a location on the web that serves the manifest. A manifest looks something like this:
+
+<pre>
+CACHE MANIFEST
+
+javascripts/application.js
+javascripts/jquery.js
+images/masthead.png
+
+NETWORK:
+/
+</pre>
+
+This specifies that the browser should cache the three files immediately following <code>CACHE MANIFEST</code>, and require a network connection for all other URLs.
+
+Unlike HTTP caches, the browser treats the files listed in the manifest as an atomic unit: either it can serve all of them out of the manifest or it needs to update all of them. It will not flush the cache unless the user specifically asks the browser to clear the cache or for security reasons.
+
+Additionally, the HTML file that supplies the @manifest@ attribute is implicitly in the manifest. This means that the browser can load the HTML file and all its cached assets as a unit, even if the device is offline.
+
+In short, the App Cache is a much stickier, atomic cache. After storing an App Cache, the browser takes the following (simplified) steps in subsequent requests:
+
+# Immediately serve the HTML file and its assets from the App Cache. This happens
+  whether or not the device is online
+# If the device is offline, treat any resources not specified in the App Cache
+  as 404s. This means that images will appear broken, for instance, unless you
+  make sure to include them in the App Cache.
+# Asynchronously try to download the file specified in the @manifest@ attribute
+# If it successfully downloads the file, compare the manifest byte-for-byte with
+  the stored manifest.
+** If it is identical, do nothing.
+** If it is not identical, download (again, asynchronously), all assets specified
+   in the manifest
+# Along the way, fire a number of JavaScript events. For instance, if the browser
+  updates the cache, fire an @updateready@ event. You can use this event to
+  display a notice to the user that the version of the HTML they are using is
+  out of date
+
+h3. App Cache Considerations
+
+The first browser hit after you change the HTML will always serve up stale HTML
+and JavaScript. You can mitigate this in two obvious ways:
+
+# Treat your mobile web app as an API consumer and make sure that your app
+  can support a "client" that's one version older than the current version
+  of the API.
+# Force the user to reload the HTML to see newer data. You can detect this
+  situation by listening for the @updateready@ event
+
+A good recommendation is to have your server support clients at most one
+version old, but force older clients to reload the page to get newer data.
+
+Regular users of your application will receive updates through normal usage,
+and will never be forced to update. Irregular users may be forced to update
+if they pick up the application months after they last used in. In all, a
+pretty good trade-off.
+
+While this may seem cumbersome at first, it makes it possible for your users
+to browse around your application more naturally when they have flaky
+connections, because the process of updating assets (including HTML)
+always happens in the background.
+
+h3. Updating the App Cache
+
+You will need to make sure that you update the cache manifest when any of
+the underlying assets change.
+
+<code>Rack::Offline</code> handles this using two strategies:
+
+# In development, it generates a SHA hash based on the timestamp for each
+  request. This means that the browser will always interpret the cache
+  manifest as stale. Note that, as discussed in the previous section,
+  you will need to reload the page twice to get updated assets.
+# In production, it generates a SHA hash once based on the contents of
+  all the assets in the manifest. This means that the cache manifest will
+  not be considered stale unless the underlying assets change.
+
+<code>Rails::Offline</code> caches all JavaScript, CSS, images and HTML
+files in @public@ and uses @config.cache_classes@ to determine which of
+the above modes to use. In Rails, you can get more fine-grained control
+over the process by using <code>Rack::Offline</code> directly.
+
+h2. Local Storage
+
+Browsers that support the App Cache also support Local Storage, from the
+<code>HTML5 Web Storage Spec</code>. IE8 and above also support Local
+Storage.
+
+Local Storage is a JavaScript API to an extremely simple key-value store.
+
+It works the same as accessing an Object in JavaScript, but persists the
+value across sessions.
+
+<pre>
+localStorage.title = "Welcome!"
+localStorage.title //=> "Welcome!"
+
+delete localStorage.title
+localStorage.title //=> undefined
+</pre>
+
+Browsers can offer different amounts of storage using this API. The
+iPhone, for instance, offers 5MB of storage, after which it asks the
+user for permission to store an additional 10MB.
+
+You can reclaim storage from a key by <code>delete</code>ing it or
+by overwriting its value. You can also enumerate over all keys in
+the localStorage using the normal JavaScript <code>for/in</code>
+API.
+
+In combination with the App Cache, you can use Local Storge to store
+data on the device, making it possible to show stale data to your
+users even if no connection is available (or in flaky connection
+scenarios).
+
+h2. Basic JavaScript Strategy
+
+You can implement a simple offline application using only a few
+lines of JavaScript. For simplicity, I will use jQuery, but you
+can easily implement this in pure JavaScript as well. The
+example is heavily commented, but the total number of lines of
+actual JavaScript is quite small.
+
+<pre lang="javascript">
+jQuery(function($) {
+  // Declare a function that can take a JS object and
+  // populate our HTML. Because we used the App Cache
+  // the HTML will be present regardless of online status
+  var updateArticles = function(object) {
+    template = $("#articles")
+    localStorage.articles = JSON.stringify(object);
+    $("#article-list").html(template.render(object));
+  }
+
+  // Create a flag so we don't poll the server twice
+  // at once
+  var updating = false;
+
+  // Create a function that will ask the server for
+  // updates to the article list
+  var remoteUpdate = function() {
+    // Don't ping the server again if we're in the
+    // process of updating
+    if(updating) return;
+
+    updating = true;
+
+    $("#loading").show();
+    $.getJSON("/article_list.json", function(json) {
+      updateArticles(json);
+      $("#loading").hide();
+      updating = false;
+    });
+  }
+
+  // If we have "articles" in the localStorage object,
+  // update the HTML with the stale articles. Even if
+  // the user never gets online, they will at least
+  // see the stale content
+  if(localStorage.articles) updateArticles(JSON.parse(localStorage.articles));
+
+  // If the user was offline, and goes online, ask
+  // the server for updates
+  $(window).bind("online", remoteUpdate);
+
+  // If the user is online, ask for updates now
+  if(window.navigator.onLine) remoteUpdate();
+})
+</pre>

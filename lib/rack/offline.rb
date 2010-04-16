@@ -1,0 +1,69 @@
+require "rack/offline/config"
+require "rack/offline/version"
+require "digest/sha2"
+require "logger"
+
+module Rack
+  class Offline
+    def self.configure(*args, &block)
+      new(*args, &block)
+    end
+
+    def initialize(options = {}, &block)
+      @cache  = options[:cache]
+
+      @logger = options[:logger] || begin
+        ::Logger.new(STDOUT).tap {|logger| logger.level = 1 }
+      end
+
+      @root   = Pathname.new(options[:root] || Dir.pwd)
+
+      if block_given?
+        @config = Rack::Offline::Config.new(&block)
+      end
+
+      if @cache
+        raise "In order to run Rack::Offline in cached mode, " \
+              "you need to supply a root so Rack::Offline can " \
+              "calculate a hash of the files." unless root
+        precache_key
+      end
+    end
+
+    def precache_key
+      hash = @config.cached.map do |item|
+        Digest::SHA2.hexdigest(@root.join(item).read)
+      end
+
+      @key = Digest::SHA2.hexdigest(hash.join)
+    end
+
+    def call(env)
+      key = @key || Digest::SHA2.hexdigest(Time.now.to_s)
+
+      body = ["CACHE MANIFEST"]
+      body << "# #{key}"
+      @config.cached.each do |item|
+        body << item
+      end
+
+      unless @config.network.empty?
+        body << "" << "NETWORK:"
+        @config.network.each do |item|
+          body << item
+        end
+      end
+
+      unless @config.fallback.empty?
+        body << "" << "FALLBACK:"
+        @config.fallback.each do |namespace, url|
+          body << "#{namespace} #{url}"
+        end
+      end
+
+      @logger.debug body.join("\n")
+
+      [200, {"Content-Type" => "text/cache-manifest"}, body.join("\n")]
+    end
+  end
+end
