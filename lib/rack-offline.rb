@@ -1,7 +1,7 @@
 require "rack/offline"
 
 module Rails
-  class Offline < ::Rack::Offline
+  class Offline < Rack::Offline
     def self.call(env)
       @app ||= new
       @app.call(env)
@@ -31,7 +31,7 @@ module Rails
           "#{root}/stylesheets/**/*.css",
           "#{root}/javascripts/**/*.js",
           "#{root}/images/**"]
-
+        
         files.each do |file|
           cache Pathname.new(file).relative_path_from(root)
         end
