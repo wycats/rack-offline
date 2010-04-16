@@ -3,10 +3,11 @@ module Rack
     class Config
       attr_reader :cached, :network, :fallback
 
-      def initialize(&block)
+      def initialize(root, &block)
         @cached = []
         @network = []
         @fallback = {}
+        @root = root
         instance_eval(&block) if block_given?
       end
 
@@ -20,6 +21,10 @@ module Rack
 
       def fallback(hash = {})
         @fallback.merge(hash)
+      end
+      
+      def root
+        @root
       end
     end
   end

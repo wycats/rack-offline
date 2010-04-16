@@ -20,7 +20,7 @@ module Rack
       @root     = Pathname.new(options[:root] || Dir.pwd)
 
       if block_given?
-        @config = Rack::Offline::Config.new(&block)
+        @config = Rack::Offline::Config.new(@root, &block)
       end
 
       if @cache
