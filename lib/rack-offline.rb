@@ -27,7 +27,7 @@ module Rails
     def cache_block
       Proc.new do
         files = Dir[
-          "#{root}/**/*.html"
+          "#{root}/**/*.html",
           "#{root}/stylesheets/**/*.css",
           "#{root}/javascripts/**/*.js",
           "#{root}/images/**"]
