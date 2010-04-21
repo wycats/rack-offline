@@ -16,13 +16,14 @@ specs:
 - rack-test: 
     version: 0.5.3
 - rspec-core: 
-    version: 2.0.0.beta.4
+    version: 2.0.0.beta.6
 - rspec-expectations: 
-    version: 2.0.0.beta.4
+    version: 2.0.0.beta.6
 - rspec-mocks: 
-    version: 2.0.0.beta.4
+    version: 2.0.0.beta.6
 - rspec: 
-    version: 2.0.0.beta.4
-hash: cffb78a951f7b10fea8527f366f4830e6045ae1e
-sources: []
-
+    version: 2.0.0.beta.6
+hash: e1a7d3a8dbf2361a815fd7cf7932e0aefc4156fe
+sources: 
+- Rubygems: 
+    uri: http://rubygems.org

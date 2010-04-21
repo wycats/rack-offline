@@ -2,6 +2,7 @@ require "rack/offline/config"
 require "rack/offline/version"
 require "digest/sha2"
 require "logger"
+require "pathname"
 
 module Rack
   class Offline
