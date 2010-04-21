@@ -1,7 +1,7 @@
 require "rack/offline"
 
 module Rails
-  class Offline < Rack::Offline
+  class Offline < ::Rack::Offline
     def self.call(env)
       @app ||= new
       @app.call(env)
@@ -9,9 +9,9 @@ module Rails
 
     def initialize(app = Rails.application, &block)
       config = app.config
-      root = Rails.public_path
+      root = config.paths.public.to_a.first
 
-      block = cache_block unless block_given?
+      block = cache_block(Pathname.new(root)) unless block_given?
 
       opts = {
         :cache => config.cache_classes,
@@ -24,7 +24,7 @@ module Rails
 
   private
 
-    def cache_block
+    def cache_block(root)
       Proc.new do
         files = Dir[
           "#{root}/**/*.html",
@@ -33,10 +33,9 @@ module Rails
           "#{root}/images/**"]
 
         files.each do |file|
-          cache file.relative_path_from(root)
+          cache Pathname.new(file).relative_path_from(root)
         end
 
-        cache *files
         network "/"
       end
     end
