@@ -20,7 +20,7 @@ module Rack
       end
 
       def fallback(hash = {})
-        @fallback.merge(hash)
+        @fallback.merge!(hash)
       end
       
       def root
