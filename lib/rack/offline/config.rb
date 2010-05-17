@@ -1,7 +1,7 @@
 module Rack
   class Offline
     class Config
-      attr_reader :cached, :network, :fallback
+      attr_reader :cached
 
       def initialize(root, &block)
         @cached = []
