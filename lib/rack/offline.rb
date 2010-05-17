@@ -36,7 +36,7 @@ module Rack
 
       body = ["CACHE MANIFEST"]
       body << "# #{key}"
-      @config.cached.each do |item|
+      @config.cache.each do |item|
         body << item
       end
 
@@ -62,7 +62,7 @@ module Rack
   private
 
     def precache_key!
-      hash = @config.cached.map do |item|
+      hash = @config.cache.map do |item|
         Digest::SHA2.hexdigest(@root.join(item).read)
       end
 

@@ -1,10 +1,8 @@
 module Rack
   class Offline
     class Config
-      attr_reader :cached
-
       def initialize(root, &block)
-        @cached = []
+        @cache = []
         @network = []
         @fallback = {}
         @root = root
@@ -12,7 +10,7 @@ module Rack
       end
 
       def cache(*names)
-        @cached.concat(names)
+        @cache.concat(names)
       end
 
       def network(*names)
