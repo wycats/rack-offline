@@ -4,12 +4,13 @@ require "fileutils"
 describe "Generating a manifest in cached mode" do
   include Rack::Test::Methods
 
-  def self.new_app
+  def self.new_app(&block)
     root = File.expand_path("../fixture_root", __FILE__)
     Rack::Offline.configure(:root => root, :cache => true) do
       cache "hello.html"
       cache "hello.css"
       cache "javascripts/hello.js"
+      instance_eval(&block) if block_given?
     end
   end
 
@@ -80,4 +81,22 @@ describe "Generating a manifest in cached mode" do
   it "doesn't contain a fallback section" do
     body.should_not =~ %r{^FALLBACK:}
   end
+
+  it "does contain a network section" do
+    self.class.app = self.class.new_app{ network "/" }
+    with_session :new_app_with_network do
+      get "/" do
+        body.should =~ %r{^NETWORK:}
+      end
+    end
+  end
+
+  it "does contain a fallback section" do
+    self.class.app = self.class.new_app{ fallback("/" => "/offline.html") }
+    with_session :new_app_with_offline do
+      get "/"
+      body.should =~ %r{^FALLBACK:}
+    end
+  end
+
 end
