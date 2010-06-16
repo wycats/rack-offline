@@ -1,7 +1,7 @@
 require "rack/offline"
 
 module Rails
-  class Offline < Rack::Offline
+  class Offline < ::Rack::Offline
     def self.call(env)
       @app ||= new
       @app.call(env)
