@@ -1,29 +1,22 @@
---- 
-dependencies: 
-  rspec: 
-    group: 
-    - :test
-    version: ~> 2.0.0.beta.4
-  rack-test: 
-    group: 
-    - :test
-    version: ">= 0"
-    require: 
-    - rack/test
-specs: 
-- rack: 
-    version: 1.1.0
-- rack-test: 
-    version: 0.5.3
-- rspec-core: 
-    version: 2.0.0.beta.6
-- rspec-expectations: 
-    version: 2.0.0.beta.6
-- rspec-mocks: 
-    version: 2.0.0.beta.6
-- rspec: 
-    version: 2.0.0.beta.6
-hash: e1a7d3a8dbf2361a815fd7cf7932e0aefc4156fe
-sources: 
-- Rubygems: 
-    uri: http://rubygems.org
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.2)
+    rack (1.1.0)
+    rack-test (0.5.4)
+      rack (>= 1.0)
+    rspec (2.0.0.beta.9)
+      rspec-core (= 2.0.0.beta.9)
+      rspec-expectations (= 2.0.0.beta.9)
+      rspec-mocks (= 2.0.0.beta.9)
+    rspec-core (2.0.0.beta.9)
+    rspec-expectations (2.0.0.beta.9)
+      diff-lcs (>= 1.1.2)
+    rspec-mocks (2.0.0.beta.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rack-test
+  rspec (~> 2.0.0.beta.4)
