@@ -3,6 +3,7 @@ require "rack/offline/version"
 require "digest/sha2"
 require "logger"
 require "pathname"
+require 'uri'
 
 module Rack
   class Offline
@@ -37,20 +38,20 @@ module Rack
       body = ["CACHE MANIFEST"]
       body << "# #{key}"
       @config.cache.each do |item|
-        body << item
+        body << URI.escape(item.to_s)
       end
 
       unless @config.network.empty?
         body << "" << "NETWORK:"
         @config.network.each do |item|
-          body << item
+          body << URI.escape(item.to_s)
         end
       end
 
       unless @config.fallback.empty?
         body << "" << "FALLBACK:"
         @config.fallback.each do |namespace, url|
-          body << "#{namespace} #{url}"
+          body << "#{namespace} #{URI.escape(url.to_s)}"
         end
       end
 
