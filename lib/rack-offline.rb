@@ -30,7 +30,7 @@ module Rails
           "#{root}/**/*.html",
           "#{root}/stylesheets/**/*.css",
           "#{root}/javascripts/**/*.js",
-          "#{root}/images/**"]
+          "#{root}/images/**/*.*"]
         
         files.each do |file|
           cache Pathname.new(file).relative_path_from(root)
