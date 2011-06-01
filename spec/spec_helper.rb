@@ -52,3 +52,26 @@ shared_examples_for "a cache manifest" do
     body.should =~ %r{^# .{64}$}
   end
 end
+
+shared_examples_for "uncached cache manifests" do
+  before do
+    @interval ||= Rack::Offline::UNCACHED_KEY_INTERVAL
+    Time.stub(:now).and_return(Time.at(@interval))
+    get "/"
+  end
+  
+  it "returns the same cache-busting comment within a given interval" do
+    cache_buster = body[/^# .{64}$/]
+    Time.stub(:now).and_return(Time.at(2 * @interval - 1))
+    get "/"
+    body[/^# .{64}$/].should == cache_buster
+  end    
+
+  it "returns a different cache-busting comment after the interval" do
+    Time.stub(:now).and_return(Time.at(@interval))
+    cache_buster = body[/^# .{64}$/]
+    Time.stub(:now).and_return(Time.at(2 * @interval))
+    get "/"
+    body[/^# .{64}$/].should_not == cache_buster
+  end
+end
