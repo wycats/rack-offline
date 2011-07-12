@@ -28,15 +28,15 @@ module Rack
         raise "In order to run Rack::Offline in cached mode, " \
               "you need to supply a root so Rack::Offline can " \
               "calculate a hash of the files." unless @root
-        precache_key!
+        generate_key!
       end
     end
 
     def call(env)
-      key = @key || Digest::SHA2.hexdigest(Time.now.to_s + Time.now.usec.to_s)
+      generate_key! unless @cache
 
       body = ["CACHE MANIFEST"]
-      body << "# #{key}"
+      body << "# #{@key}"
       @config.cache.each do |item|
         body << URI.escape(item.to_s)
       end
@@ -62,7 +62,7 @@ module Rack
 
   private
 
-    def precache_key!
+    def generate_key!
       hash = @config.cache.map do |item|
         Digest::SHA2.hexdigest(@root.join(item).read)
       end
