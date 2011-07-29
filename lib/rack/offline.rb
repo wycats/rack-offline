@@ -66,7 +66,7 @@ module Rack
 
       @logger.debug body.join("\n")
 
-      [200, {"Content-Type" => "text/cache-manifest"}, body.join("\n")]
+      [200, {"Content-Type" => "text/cache-manifest"}, [body.join("\n")]]
     end
 
   private
