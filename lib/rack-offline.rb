@@ -7,7 +7,7 @@ module Rails
       @app.call(env)
     end
 
-    def initialize(app = Rails.application, &block)
+    def initialize(options = {}, app = Rails.application, &block)
       config = app.config
       root = config.paths.public.to_a.first
 
@@ -17,7 +17,7 @@ module Rails
         :cache => config.cache_classes,
         :root => root,
         :logger => Rails.logger
-      }
+      }.merge(options)
 
       super opts, &block
     end
