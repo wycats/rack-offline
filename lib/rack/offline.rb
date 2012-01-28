@@ -83,7 +83,6 @@ module Rack
     def uncached_key
       now = Time.now.to_i - Time.now.to_i % @cache_interval
       Digest::SHA2.hexdigest(now.to_s)
-    end
-    
+    end    
   end
 end
