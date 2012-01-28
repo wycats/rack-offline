@@ -7,10 +7,8 @@ module Rails
       @app.call(env)
     end
 
-    def initialize(options = {}, app = Rails.application, &block)
-      config = app.config
-      root = config.paths.public.to_a.first
-
+    def initialize(options = {}, &block)
+      root  = Rails.public_path
       block = cache_block(Pathname.new(root)) unless block_given?
 
       opts = {
