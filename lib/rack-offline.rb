@@ -41,7 +41,7 @@ module Rails
           cache Pathname.new(file).relative_path_from(root)
         end
 
-        network "/"
+        network "*"
       end
     end
   end
