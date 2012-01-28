@@ -7,17 +7,18 @@ module Rails
       @app.call(env)
     end
 
-    def initialize(options = {}, &block)
-      root  = Rails.public_path
-      block = cache_block(Pathname.new(root)) unless block_given?
+    def initialize(options = {}, app = Rails.application, &block)
+      config = app.config
+      root   = config.paths['public'].first
+      block  = cache_block(Pathname.new(root)) unless block_given?
 
       opts = {
-        :cache => config.cache_classes,
-        :root => root,
+        :cache  => config.cache_classes,
+        :root   => root,
         :logger => Rails.logger
       }.merge(options)
 
-      super opts, &block
+      super(opts, &block)
     end
 
   private
@@ -43,6 +44,5 @@ module Rails
         network "/"
       end
     end
-
   end
 end
