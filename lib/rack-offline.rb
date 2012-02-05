@@ -9,7 +9,13 @@ module Rails
 
     def initialize(options = {}, app = Rails.application, &block)
       config = app.config
-      root = config.paths.public.to_a.first
+      paths = config.paths
+      begin
+        public_paths = paths.public
+      rescue NoMethodError
+        public_paths = paths['public']
+      end
+      root = public_paths.to_a.first
 
       block = cache_block(Pathname.new(root)) unless block_given?
 
