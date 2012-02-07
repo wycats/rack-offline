@@ -9,17 +9,16 @@ module Rails
 
     def initialize(options = {}, app = Rails.application, &block)
       config = app.config
-      root = config.paths.public.to_a.first
-
-      block = cache_block(Pathname.new(root)) unless block_given?
+      root   = config.paths['public'].first
+      block  = cache_block(Pathname.new(root)) unless block_given?
 
       opts = {
-        :cache => config.cache_classes,
-        :root => root,
+        :cache  => config.cache_classes,
+        :root   => root,
         :logger => Rails.logger
       }.merge(options)
 
-      super opts, &block
+      super(opts, &block)
     end
 
   private
@@ -42,9 +41,8 @@ module Rails
           cache Pathname.new(file).relative_path_from(root)
         end
 
-        network "/"
+        network "*"
       end
     end
-
   end
 end
