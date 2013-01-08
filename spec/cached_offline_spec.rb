@@ -90,6 +90,15 @@ describe "Generating a manifest in cached mode" do
       end
     end
   end
+  
+  it "does work cache with prefix option" do
+    self.class.app = self.class.new_app{ cache "javascripts/hello.js", prefix: "http://localhost/" }
+    with_session :new_app_with_prefix do
+      get "/" do
+        body.should =~ %r{http://localhost/javascripts/hello.js$}
+      end
+    end
+  end
 
   it "does contain a fallback section" do
     self.class.app = self.class.new_app{ fallback("/" => "/offline.html") }

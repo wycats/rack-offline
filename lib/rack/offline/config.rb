@@ -10,7 +10,12 @@ module Rack
       end
 
       def cache(*names)
-        @cache.concat(names)
+        options = names.last.is_a?(Pathname) ? {} : names.pop
+        @cache.concat([{names: names, options: options}])
+      end
+
+      def cached_files
+        @cache.inject([]){ |all_cache, cache| all_cache.concat(cache[:names]) }
       end
 
       def network(*names)
