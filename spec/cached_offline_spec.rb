@@ -99,4 +99,12 @@ describe "Generating a manifest in cached mode" do
     end
   end
 
+  it "respects the order of cache entries" do
+    self.class.app = self.class.new_app
+    with_session :new_app_with_sorted_cache_entries do
+      get "/"
+      entries = ["hello.html", "hello.css", "javascripts/hello.js"].join("\n")
+      body.should include(entries)
+    end
+  end
 end
