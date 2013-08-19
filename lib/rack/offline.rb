@@ -43,24 +43,25 @@ module Rack
 
     def call(env)
       key = @key || uncached_key
+      uri_parser = URI.const_defined?(:DEFAULT_PARSER) ? URI::DEFAULT_PARSER : URI
 
       body = ["CACHE MANIFEST"]
       body << "# #{key}"
       @config.cache.each do |item|
-        body << URI.escape(item.to_s)
+        body << uri_parser.escape(item.to_s)
       end
 
       unless @config.network.empty?
         body << "" << "NETWORK:"
         @config.network.each do |item|
-          body << URI.escape(item.to_s)
+          body << uri_parser.escape(item.to_s)
         end
       end
 
       unless @config.fallback.empty?
         body << "" << "FALLBACK:"
         @config.fallback.each do |namespace, url|
-          body << "#{namespace} #{URI.escape(url.to_s)}"
+          body << "#{namespace} #{uri_parser.escape(url.to_s)}"
         end
       end
 
