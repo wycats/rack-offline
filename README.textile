@@ -148,21 +148,21 @@ It works the same as accessing an Object in JavaScript, but persists the
 value across sessions.
 
 <pre>
-localStorage.title = "Welcome!"
-localStorage.title //=> "Welcome!"
+localStorage.setItem("title", "Welcome!")
+localStorage.getItem("title") //=> "Welcome!"
 
-delete localStorage.title
-localStorage.title //=> undefined
+localStorage.removeItem("title")
+localStorage.getItem("title") //=> null
 </pre>
 
 Browsers can offer different amounts of storage using this API. The
 iPhone, for instance, offers 5MB of storage, after which it asks the
 user for permission to store an additional 10MB.
 
-You can reclaim storage from a key by <code>delete</code>ing it or
+You can reclaim storage from a key by using the <code>removeItem</code> it or
 by overwriting its value. You can also enumerate over all keys in
 the localStorage using the normal JavaScript <code>for/in</code>
-API.
+loop.
 
 In combination with the App Cache, you can use Local Storge to store
 data on the device, making it possible to show stale data to your
@@ -184,7 +184,7 @@ jQuery(function($) {
   // the HTML will be present regardless of online status
   var updateArticles = function(object) {
     template = $("#articles")
-    localStorage.articles = JSON.stringify(object);
+    localStorage.setItem("articles", JSON.stringify(object));
     $("#article-list").html(template.render(object));
   }
 
@@ -213,7 +213,7 @@ jQuery(function($) {
   // update the HTML with the stale articles. Even if
   // the user never gets online, they will at least
   // see the stale content
-  if(localStorage.articles) updateArticles(JSON.parse(localStorage.articles));
+  if(localStorage.getItem("articles")) updateArticles(JSON.parse(localStorage.getItem("articles")));
 
   // If the user was offline, and goes online, ask
   // the server for updates
