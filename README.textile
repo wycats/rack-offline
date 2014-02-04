@@ -26,7 +26,7 @@ offline = Rack::Offline.configure do
     cache file.relative_path_from(public_path)
   end
 
-  network "/"
+  network "*"
 end
 </pre>
 
@@ -65,7 +65,7 @@ javascripts/jquery.js
 images/masthead.png
 
 NETWORK:
-/
+*
 </pre>
 
 This specifies that the browser should cache the three files immediately following <code>CACHE MANIFEST</code>, and require a network connection for all other URLs.

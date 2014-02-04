@@ -47,7 +47,11 @@ module Rack
       body = ["CACHE MANIFEST"]
       body << "# #{key}"
       @config.cache.each do |item|
-        body << URI.escape(item.to_s)
+        item[:names].each do |name|
+          name = name.to_s
+          name = "#{item[:options][:prefix]}#{name}" if item[:options] && item[:options][:prefix]
+          body << URI.escape(name)
+        end
       end
 
       unless @config.network.empty?
@@ -72,7 +76,7 @@ module Rack
   private
 
     def precache_key!
-      hash = @config.cache.sort!.map do |item|
+      hash = @config.cached_files.sort!.map do |item|
         path = @root.join(item)
         Digest::SHA2.hexdigest(path.read) if ::File.file?(path)
       end
