@@ -34,6 +34,7 @@ module Rails
             files = Rails.application.assets.each_logical_path(Rails.configuration.assets.precompile).map do |fn|
               "#{root}/#{Rails.configuration.assets.prefix}/#{fn}"
             end
+            files += Dir["#{root}/**/*.html"]
           end
         else
           files = Dir[
