@@ -25,16 +25,17 @@ module Rails
 
     def cache_block(root)
       Proc.new do
-        if Rails.version >= "3.1" && Rails.configuration.assets.enabled
+        if (Rails.version >= "3.1" && Rails.configuration.assets.enabled) ||
+           (Rails.version >= "4.0" && !Rails.configuration.assets.compile)
           files = Dir[
-            "#{root}/{**/,}*.html",
-            "#{root}/assets/{**/,}*.{js,css,jpg,png,gif}"]
+            "#{root}/**/*.html",
+            "#{root}/assets/**/*.{js,css,jpg,png,gif}"]
         else
           files = Dir[
-            "#{root}/{**/,}*.html",
-            "#{root}/stylesheets/{**/,}*.css",
-            "#{root}/javascripts/{**/,}*.js",
-            "#{root}/images/{**/,}*.*"]
+            "#{root}/**/*.html",
+            "#{root}/stylesheets/**/*.css",
+            "#{root}/javascripts/**/*.js",
+            "#{root}/images/**/*.*"]
         end
         
         files.each do |file|
