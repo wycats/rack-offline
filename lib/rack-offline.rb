@@ -36,8 +36,17 @@ module Rails
             "#{root}/javascripts/**/*.js",
             "#{root}/images/**/*.*"]
         end
-        
-        files.each do |file|
+
+        strip_fingerprint = lambda do |path|
+          path.gsub(/^(.+)-[0-9a-f]{7,40}\.([^.]+)$/, '\1.\2')
+        end
+
+        most_recent_files = files.sort_by { |f| File.ctime(f) }.reverse.reduce([]) do |list, file|
+          list << file unless list.map(&strip_fingerprint).include?(strip_fingerprint.call(file))
+          list
+        end
+
+        most_recent_files.each do |file|
           cache Pathname.new(file).relative_path_from(root)
         end
 
