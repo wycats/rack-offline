@@ -41,7 +41,7 @@ module Rails
           path.gsub(/^(.+)-[0-9a-f]{7,40}\.([^.]+)$/, '\1.\2')
         end
 
-        most_recent_files = files.sort_by { |f| File.ctime(f) }.reverse.reduce([]) do |list, file|
+        most_recent_files = files.sort_by { |f| File.mtime(f) }.reverse.reduce([]) do |list, file|
           list << file unless list.map(&strip_fingerprint).include?(strip_fingerprint.call(file))
           list
         end
