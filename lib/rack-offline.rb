@@ -50,7 +50,7 @@ module Rails
         end
 
         files.each do |file|
-          cache Pathname.new(file).relative_path_from(root)
+          cache ActionController::Base.helpers.asset_path(Pathname.new(file).relative_path_from(root))
         end
 
         network "*"
