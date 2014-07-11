@@ -29,7 +29,7 @@ module Rails
            (Rails.version >= "4.0" && !Rails.configuration.assets.compile)
           files = Dir[
             "#{root}/**/*.html",
-            "#{root}/assets/**/*.{js,css,jpg,png,gif}"]
+            "#{root}/assets/**/*.{js,css,jpg,png,gif,svg}"]
         else
           files = Dir[
             "#{root}/**/*.html",
