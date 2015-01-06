@@ -11,6 +11,11 @@ In your router:
 match "/application.manifest" => Rails::Offline
 </pre>
 
+If you are using Rails 4.0, specify the route like this: 
+<pre>
+  match '/application.manifest', to: Rails::Offline, via: :all
+</pre>
+
 This will automatically cache all JavaScript, CSS, and HTML in your @public@
 directory, and will cause the cache to be updated each request in development
 mode.
