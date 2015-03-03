@@ -65,8 +65,15 @@ module Rack
       end
 
       @logger.debug body.join("\n")
+      
+      headers = {
+        "Content-Type" => "text/cache-manifest",
+        "Expires" => DateTime.current,
+        "Cache-Control" => "max-age=0, no-cache, no-store, must-revalidate",
+        "Pragma" => "no-cache"
+      }
 
-      [200, {"Content-Type" => "text/cache-manifest"}, [body.join("\n")]]
+      [200, headers, [body.join("\n")]]
     end
 
   private
