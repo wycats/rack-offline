@@ -10,7 +10,7 @@ module Rack
     def self.configure(*args, &block)
       new(*args, &block)
     end
-    
+
     # interval in seconds used to compute the cache key when in uncached mode
     # which can be set by passing in options[:cache_interval]
     # note: setting it to 0 or a low value will change the cache key every request
@@ -20,6 +20,8 @@ module Rack
 
     def initialize(options = {}, &block)
       @cache    = options[:cache]
+
+      @key      = options[:key]
 
       @logger   = options[:logger] || begin
         ::Logger.new(STDOUT).tap {|logger| logger.level = 1 }
@@ -31,13 +33,15 @@ module Rack
         @config = Rack::Offline::Config.new(@root, &block)
       end
 
-      if @cache
-        raise "In order to run Rack::Offline in cached mode, " \
-              "you need to supply a root so Rack::Offline can " \
-              "calculate a hash of the files." unless @root
-        precache_key!
-      else
-        @cache_interval = (options[:cache_interval] || UNCACHED_KEY_INTERVAL).to_i
+      unless @key
+        if @cache
+          raise "In order to run Rack::Offline in cached mode, " \
+                "you need to supply a root so Rack::Offline can " \
+                "calculate a hash of the files." unless @root
+          precache_key!
+        else
+          @cache_interval = (options[:cache_interval] || UNCACHED_KEY_INTERVAL).to_i
+        end
       end
     end
 
@@ -79,10 +83,10 @@ module Rack
 
       @key = Digest::SHA2.hexdigest(hash.join)
     end
-    
+
     def uncached_key
       now = Time.now.to_i - Time.now.to_i % @cache_interval
       Digest::SHA2.hexdigest(now.to_s)
-    end    
+    end
   end
 end
