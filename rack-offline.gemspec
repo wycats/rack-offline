@@ -17,6 +17,9 @@ Gem::Specification.new do |s|
   s.email             = 'wycats@gmail.com'
   s.homepage          = 'http://www.yehudakatz.com'
   s.rubyforge_project = 'rack-offline'
+  s.metadata = {
+    'source_code_uri' => 'https://github.com/wycats/rack-offline'
+  }
 
   s.files        = Dir['CHANGELOG', 'README', 'LICENSE', 'lib/**/*']
   s.require_path = 'lib'
